@@ -61,29 +61,11 @@ namespace ChatroServer.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to USE [master]
-        ///GO
-        ///IF NOT EXISTS (SELECT
-        ///    name
-        ///  FROM sys.databases
-        ///  WHERE name = N&apos;ChatroDb&apos;)
-        ///BEGIN
-        ///  CREATE DATABASE [ChatroDb]
-        ///END
-        ///GO.
+        ///   Looks up a localized string similar to ChatroDb.
         /// </summary>
-        public static string DbCreateIfNotExists {
+        public static string DatabaseName {
             get {
-                return ResourceManager.GetString("DbCreateIfNotExists", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to testValue.
-        /// </summary>
-        public static string testRes {
-            get {
-                return ResourceManager.GetString("testRes", resourceCulture);
+                return ResourceManager.GetString("DatabaseName", resourceCulture);
             }
         }
     }

@@ -117,20 +117,8 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="DbCreateIfNotExists" xml:space="preserve">
-    <value>USE [master]
-GO
-IF NOT EXISTS (SELECT
-    name
-  FROM sys.databases
-  WHERE name = N'ChatroDb')
-BEGIN
-  CREATE DATABASE [ChatroDb]
-END
-GO</value>
-    <comment>SQL query used to create database if it does not exist already.</comment>
-  </data>
-  <data name="testRes" xml:space="preserve">
-    <value>testValue</value>
+  <data name="DatabaseName" xml:space="preserve">
+    <value>ChatroDb</value>
+    <comment>Name of the database to be used by this application.</comment>
   </data>
 </root>
