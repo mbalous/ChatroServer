@@ -3,6 +3,7 @@ using System.Configuration;
 using ServiceStack.OrmLite;
 using ServiceStack.OrmLite.SqlServer;
 
+
 namespace ChatroServer
 {
     public class SingletonDbConnection

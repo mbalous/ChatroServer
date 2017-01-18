@@ -12,7 +12,7 @@ namespace ChatroServer
 {
     public class Startup
     {
-        private static readonly string DB_NAME = ChatroServer.Properties.Resources.DatabaseName;
+        private static readonly string DbName = ChatroServer.Properties.Resources.DatabaseName;
 
         public void Configuration(IAppBuilder app)
         {
@@ -45,13 +45,13 @@ namespace ChatroServer
             IDbConnection dbConnection = dbFactory.Open();
             dbConnection.ChangeDatabase("master");
             int result =
-                dbConnection.SqlScalar<int>($"SELECT COUNT(*)FROM [master].sys.databases WHERE name = N'{DB_NAME}'");
+                dbConnection.SqlScalar<int>($"SELECT COUNT(*)FROM [master].sys.databases WHERE name = N'{DbName}'");
             if (result == 0)
             {
-                Debug.WriteLine($"Database [{DB_NAME}] not found. Creating database...");
-                dbConnection.ExecuteSql($"CREATE DATABASE [{DB_NAME}]");
+                Debug.WriteLine($"Database [{DbName}] not found. Creating database...");
+                dbConnection.ExecuteSql($"CREATE DATABASE [{DbName}]");
             }
-            dbConnection.ChangeDatabase(DB_NAME);
+            dbConnection.ChangeDatabase(DbName);
             dbConnection.Close();
             return dbFactory;
         }

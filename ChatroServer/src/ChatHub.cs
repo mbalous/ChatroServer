@@ -8,41 +8,14 @@ using System.Threading.Tasks;
 using Microsoft.AspNet.SignalR;
 using ServiceStack;
 using ServiceStack.Text;
-using ServiceStack.DataAnnotations;
 using ServiceStack.OrmLite;
 
 namespace ChatroServer
 {
-    public class ClientInfo
-    {
-        public ClientInfo(string connectionId)
-        {
-            if (connectionId != null)
-            {
-                this.ConnectionId = connectionId;
-            }
-            else
-            {
-                throw new ArgumentNullException(nameof(connectionId));
-            }
-        }
-
-        public string ConnectionId { get; set; }
-        public User UserEntity { get; set; }
-    }
-
-    public class User
-    {
-        [PrimaryKey]
-        public string Username { get; set; }
-        public string Password { get; set; }
-    }
-
-
     public class ChatHub : Hub
     {
         public static OrmLiteConnectionFactory ConnectionFactory { get; }
-        private static readonly List<ClientInfo> ConnectedClients = new List<ClientInfo>();
+        private static readonly Dictionary<string, User> ConnectionIdsUsers = new Dictionary<string, User>();
 
         static ChatHub()
         {
@@ -61,58 +34,49 @@ namespace ChatroServer
             }
         }
 
-
         public override Task OnConnected()
         {
             Debug.WriteLine($"Client connected - connection id: {this.Context.ConnectionId}", "info");
-            ConnectedClients.Add(new ClientInfo(this.Context.ConnectionId));
+            ConnectionIdsUsers.Add(this.Context.ConnectionId, null);
             return base.OnConnected();
         }
 
         public override Task OnDisconnected(bool stopCalled)
         {
             Debug.WriteLine($"Client disconnected - connection id: {this.Context.ConnectionId}", "info");
-            ClientInfo caller = GetCallerUserInfo();
-            ConnectedClients.Remove(caller);
+            ConnectionIdsUsers.Remove(this.Context.ConnectionId);
             return base.OnDisconnected(stopCalled);
         }
 
-        private ClientInfo GetCallerUserInfo()
-        {
-            return ConnectedClients.Find(client => client.ConnectionId == this.Context.ConnectionId);
-        }
-
-        /*
+        
         public void SendBroadcast(string message)
         {
-            ClientInfo callerInfo = GetCallerUserInfo();
-            if (callerInfo.UserName == null)
+            User username = ConnectionIdsUsers[this.Context.ConnectionId];
+            if (username == null)
             {
                 throw new HubException("Username not set, can't send anything.");
             }
-            this.Clients.All.NewBroadcast(message, callerInfo.UserName);
+            this.Clients.All.NewBroadcast(message, username);
         }
-            */
-        /*
+
         public void SendMessage(string message, string recipient)
         {
-            ClientInfo callerInfo = GetCallerUserInfo();
-            if (callerInfo.UserName == null)
+            User sender = ConnectionIdsUsers[this.Context.ConnectionId];
+            if (sender == null)
             {
                 throw new HubException("Username not set, can't send anything.");
             }
             // find recipient
-            ClientInfo user = ConnectedClients.FirstOrDefault(info => info.UserName == recipient);
-            if (user == null)
+            string recipientId = ConnectionIdsUsers.FirstOrDefault(pair => pair.Value.Username == recipient).Key;
+            if (recipientId == null)
             {
                 // user not found
                 throw new HubException($"User {recipient} not found...");
             }
             // user found sending message
-            this.Clients.Client(user.ConnectionId).NewMessage(message, callerInfo.UserName);
+            this.Clients.Client(ConnectionIdsUsers.First(pair => pair.Value.Username == recipient).Key);
         }
-        */
-
+        
 
         public LoginResult Login(string username, string password)
         {
