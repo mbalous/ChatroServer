@@ -101,5 +101,9 @@ namespace ChatroServer
     {
         Success,
         Failure
+        private bool IsLogged()
+        {
+            return ConnectionIdsUsers.Keys.Any(s => s == this.Context.ConnectionId);
+        }
     }
 }
