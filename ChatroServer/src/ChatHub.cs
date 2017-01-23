@@ -25,12 +25,9 @@ namespace ChatroServer
             using (IDbConnection db = ConnectionFactory.Open())
             {
                 db.CreateTableIfNotExists<User>();
-                User user = new User()
-                {
-                    Username = "karel",
-                    Password = "123456"
-                };
-                db.Save(user);
+                db.CreateTableIfNotExists<Message>();
+                User[] users = {new User("Karel", "123456"), new User("Varel", "123456")};
+                db.SaveAll(users);
             }
         }
 
