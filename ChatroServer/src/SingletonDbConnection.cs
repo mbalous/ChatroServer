@@ -19,7 +19,7 @@ namespace ChatroServer
         {
             string connectionString =
                 ConfigurationManager.ConnectionStrings["MsSql"].ConnectionString;
-           connectionString = connectionString.Replace("master", ChatroServer.Properties.Resources.DatabaseName);
+           connectionString = connectionString.Replace("master", Properties.Resources.DatabaseName);
             this.ConnectionFactory = new OrmLiteConnectionFactory(connectionString,
                 new SqlServer2012OrmLiteDialectProvider());
         }

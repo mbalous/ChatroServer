@@ -12,7 +12,7 @@ namespace ChatroServer
 {
     public class Startup
     {
-        private static readonly string DbName = ChatroServer.Properties.Resources.DatabaseName;
+        private static readonly string DbName = Properties.Resources.DatabaseName;
 
         public void Configuration(IAppBuilder app)
         {
