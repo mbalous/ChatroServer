@@ -45,7 +45,6 @@ namespace ChatroServer
             return base.OnDisconnected(stopCalled);
         }
 
-
         public void SendBroadcast(string content)
         {
             User username = ConnectionIdsUsers[this.Context.ConnectionId];
@@ -146,14 +145,15 @@ namespace ChatroServer
 
         private bool IsLogged()
         {
-            return ConnectionIdsUsers.Keys.Any(s => s == this.Context.ConnectionId);
-        }
-
-
-        public enum LoginResult
-        {
-            Success,
-            Failure
+            User user = ConnectionIdsUsers[this.Context.ConnectionId];
+            if (user == null)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
         }
     }
 }
