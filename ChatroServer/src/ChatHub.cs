@@ -138,22 +138,13 @@ namespace ChatroServer
 
             using (IDbConnection db = ConnectionFactory.Open())
             {
-                List<Message> messages = db.Select<Message>().Where(message => message.TimeStamp > @from).ToList();
-                return messages;
+                return db.Select<Message>().Where(message => message.TimeStamp > @from).ToList();
             }
         }
 
         private bool IsLogged()
         {
-            User user = ConnectionIdsUsers[this.Context.ConnectionId];
-            if (user == null)
-            {
-                return false;
-            }
-            else
-            {
-                return true;
-            }
+            return ConnectionIdsUsers[this.Context.ConnectionId] != null;
         }
     }
 }
