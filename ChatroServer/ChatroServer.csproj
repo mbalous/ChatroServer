@@ -143,6 +143,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="src\Entity\Message.cs" />
+    <Compile Include="src\LoginResult.cs" />
     <Compile Include="src\SingletonDbConnection.cs" />
     <Compile Include="src\Startup.cs" />
     <Compile Include="src\Entity\User.cs" />
