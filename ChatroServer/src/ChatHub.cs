@@ -22,10 +22,16 @@ namespace ChatroServer
 
             using (IDbConnection db = ConnectionFactory.Open())
             {
+#if DEBUG
+                db.DropAndCreateTable<User>();
+                db.DropAndCreateTable<Message>();
+                User[] users = { new User("Karel", "123456"), new User("Varel", "123456") };
+                db.SaveAll(users);
+#else
                 db.CreateTableIfNotExists<User>();
                 db.CreateTableIfNotExists<Message>();
-                User[] users = {new User("Karel", "123456"), new User("Varel", "123456")};
-                db.SaveAll(users);
+#endif
+
             }
         }
 
