@@ -1,14 +1,18 @@
 ﻿using System;
+using System.Data;
 using ServiceStack.DataAnnotations;
 
 namespace ChatroServer.Entity
 {
     public class User
-    {
+        {
         [PrimaryKey]
+        public Guid Guid { get; set; }
+
         public string Username { get; set; }
 
         public string Password { get; set; }
+
 
         public User(string username, string password)
         {
@@ -21,6 +25,8 @@ namespace ChatroServer.Entity
                 throw new ArgumentNullException(nameof(username));
             }
             this.Password = password;
+
+            this.Guid = Guid.NewGuid();
         }
         
         /// <summary>
