@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
+using System.IdentityModel.Tokens;
 using System.Linq;
 using System.Threading.Tasks;
 using ChatroServer.Entity;
@@ -25,7 +26,7 @@ namespace ChatroServer
 #if DEBUG
                 db.DropAndCreateTable<User>();
                 db.DropAndCreateTable<Message>();
-                User[] users = { new User("Karel", "123456"), new User("Varel", "123456") };
+                User[] users = { new User("Karel", "1"), new User("Varel", "1") };
                 db.SaveAll(users);
 #else
                 db.CreateTableIfNotExists<User>();
@@ -34,7 +35,7 @@ namespace ChatroServer
 
             }
         }
-
+        
         /// <inheritdoc />
         public override Task OnConnected()
         {
@@ -50,6 +51,8 @@ namespace ChatroServer
             ConnectionIdsUsers.Remove(this.Context.ConnectionId);
             return base.OnDisconnected(stopCalled);
         }
+
+        #region SignalR methods
 
         public void SendBroadcast(string content)
         {
@@ -76,9 +79,17 @@ namespace ChatroServer
 
             User sender = ConnectionIdsUsers[this.Context.ConnectionId];
             User userRecipient;
+
+            Message msg = new Message(DateTime.Now, sender, message);
+
             using (IDbConnection db = ConnectionFactory.Open())
             {
                 userRecipient = db.Select<User>().FirstOrDefault(user => user.Username == recipient);
+                if (userRecipient != null)
+                {
+                    msg.Recipient = userRecipient;
+                    db.Save(msg);
+                }
             }
             if (userRecipient == null)
             {
@@ -86,29 +97,12 @@ namespace ChatroServer
                 throw new Exception($"User {recipient} not found in database...");
             }
 
-            Message msg = new Message(DateTime.Now, sender, recipient);
-
             // Is the user online?
             string connectionId;
             bool isConnected = TryGetUserConnectionIdFromUsername(recipient, out connectionId);
             if (isConnected)
             {
-                this.Clients.Client(connectionId).NewMessage(message, sender.Username);
-            }
-        }
-
-        private bool TryGetUserConnectionIdFromUsername(string username, out string connectionId)
-        {
-            string result = ConnectionIdsUsers.FirstOrDefault(pair => pair.Value.Username == username).Key;
-            if (result != null)
-            {
-                connectionId = result;
-                return true;
-            }
-            else
-            {
-                connectionId = null;
-                return false;
+                this.Clients.Client(connectionId).NewMessage(message, sender);
             }
         }
 
@@ -117,7 +111,7 @@ namespace ChatroServer
             using (IDbConnection db = ConnectionFactory.Open())
             {
                 List<User> result = db.Select<User>(user => user.Username == username);
-                if (result.Count != 1)
+                if (result.Count > 1)
                 {
                     throw new ApplicationException($"More than one user with username '{username}' found.");
                 }
@@ -155,6 +149,25 @@ namespace ChatroServer
             User[] valueCollection = ConnectionIdsUsers.Values.ToArray();
             return valueCollection;
         }
+
+
+        #endregion
+
+        private bool TryGetUserConnectionIdFromUsername(string username, out string connectionId)
+        {
+            string result = ConnectionIdsUsers.FirstOrDefault(pair => pair.Value.Username == username).Key;
+            if (result != null)
+            {
+                connectionId = result;
+                return true;
+            }
+            else
+            {
+                connectionId = null;
+                return false;
+            }
+        }
+
         private bool IsLogged()
         {
             return ConnectionIdsUsers[this.Context.ConnectionId] != null;
