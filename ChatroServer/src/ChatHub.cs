@@ -148,6 +148,13 @@ namespace ChatroServer
             }
         }
 
+        public User[] GetOnlineUsers()
+        {
+            if (!IsLogged())
+                return new User[0];
+            User[] valueCollection = ConnectionIdsUsers.Values.ToArray();
+            return valueCollection;
+        }
         private bool IsLogged()
         {
             return ConnectionIdsUsers[this.Context.ConnectionId] != null;
